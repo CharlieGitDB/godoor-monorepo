@@ -3,7 +3,7 @@ import { signIn, useSession } from 'next-auth/react'
 import ProfileButton from '../ProfileButton/ProfileButton'
 
 const UserIcon = () => {
-  const { data: session, status } = useSession()
+  const { data: session } = useSession()
 
   const isLoggedIn = !!session?.user
 

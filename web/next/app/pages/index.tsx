@@ -5,7 +5,6 @@ import Head from 'next/head'
 import Header from '../components/Header/Header'
 
 const Home: NextPage = props => {
-  console.log('home page props')
   return (
     <div>
       <Head>
