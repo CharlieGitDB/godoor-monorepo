@@ -1,29 +1,38 @@
 import { EmotionCache } from '@emotion/cache'
 import { CacheProvider } from '@emotion/react'
 import { CssBaseline } from '@mui/material'
+import { Session } from 'next-auth'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
-import Themer from '../components/Themer/Themer'
+import GlobalProviders from '../components/GlobalProviders/GlobalProviders'
 import '../styles/globals.css'
 import createEmotionCache from '../util/createEmotionCache'
 
 const clientSideEmotionCache = createEmotionCache()
 
 interface MyAppProps extends AppProps {
-  emotionCache?: EmotionCache;
+  emotionCache?: EmotionCache
+  session: Session
 }
 
 const MyApp = (props: MyAppProps) => {
-  const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
+  const {
+    Component,
+    emotionCache = clientSideEmotionCache,
+    pageProps,
+    session
+  } = props
+
   return (
     <CacheProvider value={emotionCache}>
       <Head>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
-      <Themer>
+
+      <GlobalProviders session={session}>
         <CssBaseline />
         <Component {...pageProps} />
-      </Themer>
+      </GlobalProviders>
     </CacheProvider>
   )
 }
