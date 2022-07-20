@@ -1,6 +1,6 @@
 import { AppBar, Toolbar, Typography } from '@mui/material'
 import Link from 'next/link'
-import UserIcon from '../UserIcon/UserIcon'
+import UserIcon from '../UserButton/UserButton'
 
 const Header = () => (
   <AppBar position={'static'}>

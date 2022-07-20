@@ -1,8 +1,9 @@
 import { Button } from '@mui/material'
 import { signIn, useSession } from 'next-auth/react'
+import ProfileButton from '../ProfileButton/ProfileButton'
 
 const UserIcon = () => {
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
 
   const isLoggedIn = !!session?.user
 
@@ -16,9 +17,7 @@ const UserIcon = () => {
     </Button>
   )
 
-  const Profile = () => <>{JSON.stringify(session?.user)}</>
-
-  return <div>{isLoggedIn ? <Profile /> : <SignInButton />}</div>
+  return <div>{isLoggedIn ? <ProfileButton /> : <SignInButton />}</div>
 }
 
 export default UserIcon
