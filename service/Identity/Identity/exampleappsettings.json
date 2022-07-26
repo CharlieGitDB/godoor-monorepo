@@ -1,0 +1,20 @@
+﻿{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "AzureAdB2C": {
+    "Instance": "https://{yourb2ctenantname}.b2clogin.com",
+    "Domain": "{yourb2ctenantname}.onmicrosoft.com",
+    "ClientId": "{this app registration client id}",
+    "SignedOutCallbackPath": "/signout/{your userflow policy id}",
+    "SignUpSignInPolicyId": "{your userflow policy id}"
+  },
+  "ApiVersion": 1,
+  "ClientId": "{the id of the app registration with access to login with redirect uris}",
+  "Scope": "{the scope permission that this api needs to access the token}"
+}
+
