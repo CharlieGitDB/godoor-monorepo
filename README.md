@@ -1,5 +1,5 @@
 # Godoor
-This application is used to manage, and organize properties you own or are involved with.  This could be used for a timeshare, or a shared cabin, or an landlord property organization. This project is being created as an example of a portfolio of development work. 
+This application is used to manage, and organize properties you own or are involved with.  This could be used for a timeshare, or a shared cabin, or an landlord property organization. This project is being created as an example for a portfolio of development work. 
 
 **The main goals of this project will be:**
 1. Have visuals describing and explaining the architecture
