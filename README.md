@@ -61,7 +61,8 @@ The directories immediately under Web are the different front end web techologie
 The directories under the specific front end libraries are for micro frontends which would be their own isolated instances/projects using the library.  Depending on how large the app becomes, it can be useful to allow different parts of the front end to be isolated instances that can be deployed on their own.  Example:
   - an app instance could handle the main guts of the app
   - a dashboard instance that handles only the dashboard ui
-  - a user-management instance which only handles the user settings and ui such as profile, preferences etc  
+  - a user-management instance which only handles the user settings and ui such as profile, preferences etc 
+  - shared is a library/custom dependency which would consist of reuseable components between micro frontends
 
 **Services:**  
 *Services -> [Programming Language/Framework]*  
