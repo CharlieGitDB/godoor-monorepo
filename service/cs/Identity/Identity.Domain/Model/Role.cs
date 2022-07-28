@@ -1,11 +1,10 @@
-﻿using System;
-namespace Identity.Domain
+﻿namespace Identity.Domain
 {
-	public enum Role
-	{
-		ROOT = 0,
-		SPECIALIST = 100,
-		USER = 200
-	}
+  public enum Role
+  {
+    ROOT = 0,
+    SPECIALIST = 100,
+    USER = 200
+  }
 }
 

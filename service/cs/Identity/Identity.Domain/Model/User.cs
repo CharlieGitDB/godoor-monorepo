@@ -1,15 +1,14 @@
-﻿using System;
-namespace Identity.Domain
+﻿namespace Identity.Domain
 {
-	public class User
-	{
-		public int Id { get; set; }
+  public class User
+  {
+    public int Id { get; set; }
 
-		public string Oid { get; set; }
+    public string Oid { get; set; }
 
-		public Role Role { get; set; }
+    public Role Role { get; set; }
 
-		public bool Active { get; set; } = true;
-	}
+    public bool Active { get; set; } = true;
+  }
 }
 
