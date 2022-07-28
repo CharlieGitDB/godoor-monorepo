@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
 using Microsoft.OpenApi.Models;
+using Microsoft.EntityFrameworkCore;
+using Identity.Data;
+using Identity.API.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +12,9 @@ string API_VERSION = builder.Configuration["ApiVersion"];
 string B2C_INSTANCE = builder.Configuration["AzureAdB2C:Instance"];
 string B2C_DOMAIN = builder.Configuration["AzureAdB2C:Domain"];
 string B2C_SIGNUP_AND_SIGNIN_POLICY_ID = builder.Configuration["AzureAdB2C:SignUpSignInPolicyId"];
+
+AzureAdB2CSection azureB2CSection = builder.Configuration.GetSection("AzureAdB2C").Get<AzureAdB2CSection>();
+LocalMSSqlSection localMSSqlSection = builder.Configuration.GetSection("LocalMSSql").Get<LocalMSSqlSection>();
 
 //login access config vars
 string API_PERMISSION = builder.Configuration["Scope"];
@@ -29,6 +35,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // End of the Microsoft Identity platform block
 
 builder.Services.AddControllers();
+builder.Services.AddDbContext<IdentityDbContext>(options =>
+{
+    options.UseSqlServer(
+            $"Server={localMSSqlSection.Server};User Id={localMSSqlSection.Username};Password={localMSSqlSection.Password};Database={localMSSqlSection.DatabaseName}"
+        );
+    options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {

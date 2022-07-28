@@ -33,7 +33,6 @@ namespace Identity.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Oid")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Role")

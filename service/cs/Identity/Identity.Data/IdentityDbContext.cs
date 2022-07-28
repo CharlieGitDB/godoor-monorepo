@@ -1,18 +1,18 @@
 using Identity.Domain;
 using Microsoft.EntityFrameworkCore;
 
+#nullable disable
+
 namespace Identity.Data
 {
-  public class IdentityDbContext : DbContext
-  {
-    public DbSet<User> Users { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder dbContextOptionsBuilder)
+    public class IdentityDbContext : DbContext
     {
-      dbContextOptionsBuilder.UseSqlServer(
-        "Server=localhost;User Id=sa;Password=very_cool_password_ok;Database=IdentityService");
-      base.OnConfiguring(dbContextOptionsBuilder);
+        public DbSet<User> Users { get; set; }
+
+        public IdentityDbContext(DbContextOptions<IdentityDbContext> options) : base(options)
+        {
+
+        }
     }
-  }
 }
 

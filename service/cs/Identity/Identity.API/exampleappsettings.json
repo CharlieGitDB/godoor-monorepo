@@ -15,6 +15,12 @@
   },
   "ApiVersion": 1,
   "ClientId": "{the id of the app registration with access to login with redirect uris}",
-  "Scope": "{the scope permission that this api needs to access the token}"
+  "Scope": "{the scope permission that this api needs to access the token}",
+  "LocalMSSql": {
+    "Server": "localhost",
+    "Username": "sa",
+    "Password": "this_is_a_local_password1234",
+    "DatabaseName": "IdentityServiceDb"
+  }
 }
 

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Identity.Data.Migrations
 {
     [DbContext(typeof(IdentityDbContext))]
-    [Migration("20220728003351_CreateIdentityDbContext")]
+    [Migration("20220728033259_CreateIdentityDbContext")]
     partial class CreateIdentityDbContext
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -35,7 +35,6 @@ namespace Identity.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Oid")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Role")

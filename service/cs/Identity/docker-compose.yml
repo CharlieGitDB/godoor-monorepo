@@ -8,5 +8,5 @@ services:
       - "1433:1433"
     environment:
       # username is sa
-      SA_PASSWORD: "very_cool_password_ok"
+      SA_PASSWORD: "this_is_a_local_password1234"
       ACCEPT_EULA: "Y"
