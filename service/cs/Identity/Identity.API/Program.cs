@@ -9,12 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 string API_VERSION = builder.Configuration["ApiVersion"];
 
-string B2C_INSTANCE = builder.Configuration["AzureAdB2C:Instance"];
-string B2C_DOMAIN = builder.Configuration["AzureAdB2C:Domain"];
-string B2C_SIGNUP_AND_SIGNIN_POLICY_ID = builder.Configuration["AzureAdB2C:SignUpSignInPolicyId"];
-
 AzureAdB2CSection azureB2CSection = builder.Configuration.GetSection("AzureAdB2C").Get<AzureAdB2CSection>();
-LocalMSSqlSection localMSSqlSection = builder.Configuration.GetSection("LocalMSSql").Get<LocalMSSqlSection>();
+LocalMSSqlSection localMsSqlSection = builder.Configuration.GetSection("LocalMSSql").Get<LocalMSSqlSection>();
 
 //login access config vars
 string API_PERMISSION = builder.Configuration["Scope"];
@@ -38,7 +34,7 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<IdentityDbContext>(options =>
 {
     options.UseSqlServer(
-            $"Server={localMSSqlSection.Server};User Id={localMSSqlSection.Username};Password={localMSSqlSection.Password};Database={localMSSqlSection.DatabaseName}"
+            $"Server={localMsSqlSection.Server};User Id={localMsSqlSection.Username};Password={localMsSqlSection.Password};Database={localMsSqlSection.DatabaseName}"
         );
     options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 });
@@ -64,8 +60,8 @@ builder.Services.AddSwaggerGen(c =>
                 {
                     { API_PERMISSION, "Access the identity API" }
                 },
-                AuthorizationUrl = new Uri($"{B2C_INSTANCE}/{B2C_DOMAIN}/{B2C_SIGNUP_AND_SIGNIN_POLICY_ID}/oauth2/v2.0/authorize"),
-                TokenUrl = new Uri($"{B2C_INSTANCE}/{B2C_DOMAIN}/{B2C_SIGNUP_AND_SIGNIN_POLICY_ID}/oauth2/v2.0/token")
+                AuthorizationUrl = new Uri($"{azureB2CSection.Instance}/{azureB2CSection.Domain}/{azureB2CSection.SignUpSignInPolicyId}/oauth2/v2.0/authorize"),
+                TokenUrl = new Uri($"{azureB2CSection.Instance}/{azureB2CSection.Domain}/{azureB2CSection.SignUpSignInPolicyId}/oauth2/v2.0/token")
             }
         }
     });
