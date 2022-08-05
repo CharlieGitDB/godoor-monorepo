@@ -4,6 +4,9 @@ using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Identity.Data;
 using Identity.API.Configurations;
+using Identity.Data.Services;
+using Identity.Domain.Entities;
+using Identity.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 
@@ -48,6 +51,7 @@ builder.Services.AddDbContext<IdentityDbContext>(options =>
         );
     options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 });
+builder.Services.AddSingleton<IGenericRepository<User>, UserRepository>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>

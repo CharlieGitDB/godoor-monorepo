@@ -1,6 +1,8 @@
 ﻿#nullable disable
 
-namespace Identity.Domain
+using Identity.Domain.Enums;
+
+namespace Identity.Domain.Entities
 {
     public class User
     {
