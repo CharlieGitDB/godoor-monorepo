@@ -4,6 +4,8 @@ using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Identity.Data;
 using Identity.API.Configurations;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +33,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // End of the Microsoft Identity platform block
 
 builder.Services.AddControllers();
+builder.Services.AddApiVersioning(options =>
+{
+    options.ReportApiVersions = true;
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.DefaultApiVersion = new ApiVersion(Int32.Parse(API_VERSION), 0);
+    options.ReportApiVersions = true;
+    options.ApiVersionReader = new HeaderApiVersionReader("X-Api-Version");
+});
 builder.Services.AddDbContext<IdentityDbContext>(options =>
 {
     options.UseSqlServer(

@@ -9,10 +9,11 @@ using Microsoft.Identity.Web.Resource;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace Identity.API.Controllers
+namespace Identity.API.Controllers.v1
 {
     [Authorize]
     [Route("api/[controller]")]
+    [ApiVersion("1.0")]
     public class MeController : Controller
     {
         // GET: api/values
