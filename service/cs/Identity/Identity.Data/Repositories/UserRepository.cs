@@ -1,16 +1,17 @@
+using System.Security.Cryptography;
 using Identity.Domain.Entities;
 using Identity.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Identity.Data.Services;
+namespace Identity.Data.Repositories;
 
-public class UserRepository : IGenericRepository<User>
+public class UserRepository : IUserRepository
 {
     public IdentityDbContext _dbContext { get; set; }
 
     public UserRepository(IdentityDbContext dbContext)
     {
-        this._dbContext = dbContext;
+        _dbContext = dbContext;
     }
 
     public async Task<List<User>> GetAllAsync()
@@ -21,6 +22,11 @@ public class UserRepository : IGenericRepository<User>
     public async Task<User?> GetByIdAsync(string id)
     {
         return await _dbContext.Users.FindAsync(id);
+    }
+
+    public async Task<User?> GetByOidAsync(string id)
+    {
+        return await _dbContext.Users.FirstOrDefaultAsync(u => u.Oid == id);
     }
 
     public async Task<int> SaveAsync(User user)

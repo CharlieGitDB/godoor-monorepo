@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
 using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Identity.Data;
 using Identity.API.Configurations;
-using Identity.Data.Services;
+using Identity.API.Models.Request;
+using Identity.Data.Repositories;
 using Identity.Domain.Entities;
 using Identity.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -44,6 +46,7 @@ builder.Services.AddApiVersioning(options =>
     options.ReportApiVersions = true;
     options.ApiVersionReader = new HeaderApiVersionReader("X-Api-Version");
 });
+
 builder.Services.AddDbContext<IdentityDbContext>(options =>
 {
     options.UseSqlServer(
@@ -51,7 +54,12 @@ builder.Services.AddDbContext<IdentityDbContext>(options =>
         );
     options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 });
-builder.Services.AddSingleton<IGenericRepository<User>, UserRepository>();
+
+//repos
+builder.Services.AddTransient<IUserRepository, UserRepository>();
+
+//validation
+builder.Services.AddScoped<IValidator<CreateUserRequest>, CreateUserRequestValidator>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
