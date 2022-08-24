@@ -7,7 +7,6 @@ using Identity.Data;
 using Identity.API.Configurations;
 using Identity.API.Models.Request;
 using Identity.Data.Repositories;
-using Identity.Domain.Entities;
 using Identity.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
@@ -41,7 +40,7 @@ builder.Services.AddControllers();
 builder.Services.AddApiVersioning(options =>
 {
     options.ReportApiVersions = true;
-    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.AssumeDefaultVersionWhenUnspecified = true; // TODO: revisit this, we may not want this
     options.DefaultApiVersion = new ApiVersion(Int32.Parse(API_VERSION), 0);
     options.ReportApiVersions = true;
     options.ApiVersionReader = new HeaderApiVersionReader("X-Api-Version");

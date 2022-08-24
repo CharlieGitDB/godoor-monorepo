@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using FluentValidation;
 using Identity.API.Models.Request;
@@ -13,13 +14,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.Resource;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Identity.API.Controllers.v1
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiVersion("1.0")]
     public class MeController : Controller
@@ -33,6 +35,7 @@ namespace Identity.API.Controllers.v1
             _userRepository = userRepository;
         }
         
+        // TODO: should this even exist? If so it needs to be locked to admins
         // GET: api/values
         [HttpGet]
         public async Task<IActionResult> Get()
@@ -53,7 +56,8 @@ namespace Identity.API.Controllers.v1
 
             return Ok(user);
         }
-
+        
+        // TODO: this needs to only be able to be hit by a azure function that runs on azure b2c creation
         // POST api/values
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] CreateUserRequest createUserRequest)
@@ -67,17 +71,20 @@ namespace Identity.API.Controllers.v1
                 return BadRequest(errors);
             }
 
-            var user = new User()
+            var user = new User
             {
                 Oid = createUserRequest.Oid,
-                Role = Role.User
+                Role = Role.User,
+                CreatedByOid = User.GetObjectId(),
+                ModifiedByOid = User.GetObjectId()
             };
+            
             var savedUser = await _userRepository.SaveAsync(user);
 
             return Ok(savedUser);
         }
 
-        // create is user filter
+        // TODO: create user filter here
         // PUT api/values/5
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(string id, [FromBody] UpdateUserRequest updateUserRequest)
@@ -92,12 +99,13 @@ namespace Identity.API.Controllers.v1
             
             currentUser.Role = updateUserRequest.Role ?? currentUser.Role;
             currentUser.Active = updateUserRequest.Active ?? currentUser.Active;
+            currentUser.ModifiedByOid = User.GetObjectId();
             var updatedUser = await _userRepository.SaveAsync(currentUser);
 
             return Ok(updatedUser);
         }
 
-        // create is user filter
+        // TODO: use user filter here
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {

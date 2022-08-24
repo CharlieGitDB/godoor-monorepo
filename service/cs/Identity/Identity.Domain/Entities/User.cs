@@ -4,7 +4,7 @@ using Identity.Domain.Enums;
 
 namespace Identity.Domain.Entities
 {
-    public class User
+    public class User : Base
     {
         public int Id { get; set; }
 
