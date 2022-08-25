@@ -87,7 +87,7 @@ namespace Identity.API.Controllers.v1
         // TODO: create user filter here
         // PUT api/values/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(string id, [FromBody] UpdateUserRequest updateUserRequest)
+        public async Task<ActionResult> Put(string id, [FromBody] UpdateUserRequest updateUserRequest)
         {
             //shouldn't make it here unless we have confirmed the oid is the users id from a filter most likely
             var currentUser = await _userRepository.GetByOidAsync(id);
@@ -107,7 +107,7 @@ namespace Identity.API.Controllers.v1
 
         // TODO: use user filter here
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<ActionResult> Delete(string id)
         {
             var userToDelete = await _userRepository.GetByOidAsync(id);
 
