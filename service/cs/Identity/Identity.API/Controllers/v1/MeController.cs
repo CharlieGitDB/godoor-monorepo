@@ -38,16 +38,16 @@ namespace Identity.API.Controllers.v1
         // TODO: should this even exist? If so it needs to be locked to admins
         // GET: api/values
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<ActionResult> Get()
         {
             return Ok(await _userRepository.GetAllAsync());
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(string id)
+        public async Task<ActionResult> Get(string id)
         {
-            var user = await _userRepository.GetByIdAsync(id);
+            var user = await _userRepository.GetByOidAsync(id);
 
             if (user == null)
             {
@@ -109,7 +109,7 @@ namespace Identity.API.Controllers.v1
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
-            var userToDelete = await _userRepository.GetByIdAsync(id);
+            var userToDelete = await _userRepository.GetByOidAsync(id);
 
             if (userToDelete == null)
             {
