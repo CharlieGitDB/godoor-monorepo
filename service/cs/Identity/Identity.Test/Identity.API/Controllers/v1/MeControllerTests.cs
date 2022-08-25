@@ -1,8 +1,11 @@
+using System.Security.Claims;
 using FluentValidation;
+using FluentValidation.Results;
 using Identity.API.Controllers.v1;
 using Identity.API.Models.Request;
 using Identity.Domain.Entities;
 using Identity.Domain.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
@@ -78,5 +81,74 @@ public class MeControllerTests
         
         Assert.IsNotNull(result);
         Assert.IsInstanceOfType(result, typeof(NotFoundResult));
+    }
+    
+    [TestMethod]
+    public async Task Post_ShouldReturnOkResult()
+    {
+        var fakeoid = "fakeoid";
+        var mockValidator = new Mock<IValidator<CreateUserRequest>>();
+        mockValidator
+            .Setup(x => x.ValidateAsync(It.IsAny<CreateUserRequest>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult());
+        var mockUserRepository = new Mock<IUserRepository>();
+        var createUserRequest = new CreateUserRequest
+        {
+            Oid = fakeoid
+        };
+        var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+        {
+            new ("oid", fakeoid)
+        }, "mock"));
+
+
+        var controller = new MeController(mockValidator.Object, mockUserRepository.Object);
+        controller.ControllerContext = new ControllerContext()
+        {
+            HttpContext = new DefaultHttpContext()
+            {
+                User = user
+            }
+        };
+        var result = await controller.Post(createUserRequest);
+        
+        Assert.IsNotNull(result);
+        Assert.IsInstanceOfType(result, typeof(OkObjectResult));
+    }
+    
+    [TestMethod]
+    public async Task Post_ShouldReturnBadRequest_WhenThereIsNoOidInBody()
+    {
+        var fakeoid = "fakeoid";
+        var mockValidator = new Mock<IValidator<CreateUserRequest>>();
+        mockValidator
+            .Setup(x => x.ValidateAsync(It.IsAny<CreateUserRequest>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult(new List<ValidationFailure>()
+            {
+                new ("Oid", "oid required")
+                {
+                    ErrorCode = "111"
+                }
+            }));
+        var mockUserRepository = new Mock<IUserRepository>();
+        var createUserRequest = new CreateUserRequest();
+        var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+        {
+            new ("oid", fakeoid)
+        }, "mock"));
+
+
+        var controller = new MeController(mockValidator.Object, mockUserRepository.Object);
+        controller.ControllerContext = new ControllerContext()
+        {
+            HttpContext = new DefaultHttpContext()
+            {
+                User = user
+            }
+        };
+        var result = await controller.Post(createUserRequest);
+        
+        Assert.IsNotNull(result);
+        Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
     }
 }

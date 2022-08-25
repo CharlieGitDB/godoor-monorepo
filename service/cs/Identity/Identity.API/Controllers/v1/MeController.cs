@@ -60,7 +60,7 @@ namespace Identity.API.Controllers.v1
         // TODO: this needs to only be able to be hit by a azure function that runs on azure b2c creation
         // POST api/values
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] CreateUserRequest createUserRequest)
+        public async Task<ActionResult> Post([FromBody] CreateUserRequest createUserRequest)
         {
             var result = await _validator.ValidateAsync(createUserRequest);
 
