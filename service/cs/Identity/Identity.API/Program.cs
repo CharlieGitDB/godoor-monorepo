@@ -16,7 +16,8 @@ var builder = WebApplication.CreateBuilder(args);
 string API_VERSION = builder.Configuration["ApiVersion"];
 
 AzureAdB2CSection azureB2CSection = builder.Configuration.GetSection("AzureAdB2C").Get<AzureAdB2CSection>();
-LocalMSSqlSection localMsSqlSection = builder.Configuration.GetSection("LocalMSSql").Get<LocalMSSqlSection>();
+CosmoDbEmulatorSection cosmoDbEmulatorSection =
+    builder.Configuration.GetSection("CosmoDbEmulator").Get<CosmoDbEmulatorSection>();
 
 //login access config vars
 string API_PERMISSION = builder.Configuration["Scope"];
@@ -48,10 +49,11 @@ builder.Services.AddApiVersioning(options =>
 
 builder.Services.AddDbContext<IdentityDbContext>(options =>
 {
-    options.UseSqlServer(
-            $"Server={localMsSqlSection.Server};User Id={localMsSqlSection.Username};Password={localMsSqlSection.Password};Database={localMsSqlSection.DatabaseName}"
-        );
-    options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+    options.UseCosmos(
+        accountEndpoint: cosmoDbEmulatorSection.EndPointUri,
+        accountKey: cosmoDbEmulatorSection.PrimaryKey,
+        databaseName: cosmoDbEmulatorSection.DbName
+    );
 });
 
 //repos
