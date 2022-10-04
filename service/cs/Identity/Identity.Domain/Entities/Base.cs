@@ -2,7 +2,7 @@ namespace Identity.Domain.Entities;
 
 public class Base
 {
-    
+    public Guid Id { get; set; } 
     public DateTime Created { get; set; } 
     public string CreatedByOid { get; set; }
     

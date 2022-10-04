@@ -6,8 +6,6 @@ namespace Identity.Domain.Entities
 {
     public class User : Base
     {
-        public int Id { get; set; }
-
         public string Oid { get; set; }
 
         public Role Role { get; set; }

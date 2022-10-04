@@ -16,8 +16,8 @@ var builder = WebApplication.CreateBuilder(args);
 string API_VERSION = builder.Configuration["ApiVersion"];
 
 AzureAdB2CSection azureB2CSection = builder.Configuration.GetSection("AzureAdB2C").Get<AzureAdB2CSection>();
-CosmoDbEmulatorSection cosmoDbEmulatorSection =
-    builder.Configuration.GetSection("CosmoDbEmulator").Get<CosmoDbEmulatorSection>();
+CosmosDbSection cosmosDbSection =
+    builder.Configuration.GetSection("CosmosDB").Get<CosmosDbSection>();
 
 //login access config vars
 string API_PERMISSION = builder.Configuration["Scope"];
@@ -50,9 +50,9 @@ builder.Services.AddApiVersioning(options =>
 builder.Services.AddDbContext<IdentityDbContext>(options =>
 {
     options.UseCosmos(
-        accountEndpoint: cosmoDbEmulatorSection.EndPointUri,
-        accountKey: cosmoDbEmulatorSection.PrimaryKey,
-        databaseName: cosmoDbEmulatorSection.DbName
+        accountEndpoint: cosmosDbSection.EndPointUri,
+        accountKey: cosmosDbSection.PrimaryKey,
+        databaseName: cosmosDbSection.DbName
     );
 });
 
@@ -112,12 +112,12 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(c =>
+    app.UseSwaggerUI(o =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", $"Godoor Identity v{API_VERSION}");
-        c.OAuthClientId(LOGIN_CLIENT_ID);
-        c.OAuthUsePkce();
-        c.OAuthScopeSeparator(" ");
+        o.SwaggerEndpoint("/swagger/v1/swagger.json", $"Godoor Identity v{API_VERSION}");
+        o.OAuthClientId(LOGIN_CLIENT_ID);
+        o.OAuthUsePkce();
+        o.OAuthScopeSeparator(" ");
     });
 }
 

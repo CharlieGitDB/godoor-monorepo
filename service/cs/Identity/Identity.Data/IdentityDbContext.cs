@@ -17,6 +17,10 @@ namespace Identity.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>()
+                .ToContainer("user");
+            modelBuilder.Entity<User>()
+                .HasPartitionKey(u => u.Id);
+            modelBuilder.Entity<User>()
                 .Property(u => u.Oid)
                 .IsRequired();
             modelBuilder.Entity<User>()
@@ -65,6 +69,7 @@ namespace Identity.Data
                 }
 
                 ((Base) entity.Entity).Modified = DateTime.UtcNow;
+                ((Base) entity.Entity).Id = Guid.NewGuid();
             }
         }
     }
