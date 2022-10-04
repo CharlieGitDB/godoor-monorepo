@@ -63,13 +63,14 @@ namespace Identity.Data
 
             foreach (var entity in entities)
             {
+                string 
                 if (entity.State == EntityState.Added)
                 {
                     ((Base) entity.Entity).Created = DateTime.UtcNow;
+                    ((Base) entity.Entity).Id = Guid.NewGuid();
                 }
 
                 ((Base) entity.Entity).Modified = DateTime.UtcNow;
-                ((Base) entity.Entity).Id = Guid.NewGuid();
             }
         }
     }
