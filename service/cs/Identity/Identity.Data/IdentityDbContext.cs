@@ -16,32 +16,8 @@ namespace Identity.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>()
-                .ToContainer("user");
-            modelBuilder.Entity<User>()
-                .HasPartitionKey(u => u.Id);
-            modelBuilder.Entity<User>()
-                .Property(u => u.Oid)
-                .IsRequired();
-            modelBuilder.Entity<User>()
-                .HasIndex(u => new { u.Id, u.Oid })
-                .IsUnique();
-            modelBuilder.Entity<User>()
-                .Property(u => u.Role)
-                .IsRequired();
-            modelBuilder.Entity<User>()
-                .Property(u => u.Created)
-                .IsRequired();
-            modelBuilder.Entity<User>()
-                .Property(u => u.CreatedByOid)
-                .IsRequired();
-            modelBuilder.Entity<User>()
-                .Property(u => u.Modified)
-                .IsRequired();
-            modelBuilder.Entity<User>()
-                .Property(u => u.ModifiedByOid)
-                .IsRequired();
-            
+            modelBuilder.ApplyConfiguration(new UserEntityTypeConfiguration());
+
             base.OnModelCreating(modelBuilder);
         }
 
@@ -63,11 +39,10 @@ namespace Identity.Data
 
             foreach (var entity in entities)
             {
-                string 
                 if (entity.State == EntityState.Added)
                 {
-                    ((Base) entity.Entity).Created = DateTime.UtcNow;
                     ((Base) entity.Entity).Id = Guid.NewGuid();
+                    ((Base) entity.Entity).Created = DateTime.UtcNow;
                 }
 
                 ((Base) entity.Entity).Modified = DateTime.UtcNow;
