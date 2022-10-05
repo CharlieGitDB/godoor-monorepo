@@ -76,8 +76,8 @@ namespace Identity.API.Controllers.v1
 
         // TODO: create user filter here
         // PUT api/values/5
-        [HttpPut("{id}")]
-        public async Task<ActionResult> Put(string id, [FromBody] UpdateUserRequest updateUserRequest)
+        [HttpPatch("{id}")]
+        public async Task<ActionResult> Patch(string id, [FromBody] UpdateUserRequest updateUserRequest)
         {
             //shouldn't make it here unless we have confirmed the oid is the users id from a filter most likely
             var currentUser = await _userRepository.GetByOidAsync(id);

@@ -1,4 +1,3 @@
-using System.Security.Cryptography;
 using Identity.Domain.Entities;
 using Identity.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -31,7 +30,15 @@ public class UserRepository : IUserRepository
 
     public async Task<int> SaveAsync(User user)
     {
-        _dbContext.Users.Add(user);
+        if (await _dbContext.Users.FindAsync(user.Id) is User existing)
+        {
+            _dbContext.Entry(existing).CurrentValues.SetValues(user);
+        }
+        else
+        {
+            _dbContext.Users.Add(user);
+        }
+
         return await _dbContext.SaveChangesAsync();
     }
 
