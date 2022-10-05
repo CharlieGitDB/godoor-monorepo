@@ -160,7 +160,7 @@ public class MeControllerTests
         var mockUserRepository = new Mock<IUserRepository>();
 
         var controller = new MeController(mockValidator.Object, mockUserRepository.Object);
-        var result = await controller.Put(fakeoid, new UpdateUserRequest());
+        var result = await controller.Patch(fakeoid, new UpdateUserRequest());
         
         Assert.IsInstanceOfType(result, typeof(NotFoundResult));
     }
@@ -190,7 +190,7 @@ public class MeControllerTests
                 User = user
             }
         };
-        var result = await controller.Put(fakeoid, new UpdateUserRequest());
+        var result = await controller.Patch(fakeoid, new UpdateUserRequest());
         
         Assert.IsNotNull(result);
         Assert.IsInstanceOfType(result, typeof(OkObjectResult));
