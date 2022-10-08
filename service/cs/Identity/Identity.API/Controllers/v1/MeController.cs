@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using FluentValidation.AspNetCore;
 using Identity.API.Models.Request;
 using Identity.Domain.Entities;
 using Identity.Domain.Enums;
@@ -56,9 +57,7 @@ namespace Identity.API.Controllers.v1
 
             if (!result.IsValid)
             {
-                var errorMessages = result.Errors.Select(r => r.ErrorMessage);
-                var errors = errorMessages.Aggregate((a, b) => a + ", " + b);
-                return BadRequest(errors);
+                return ValidationProblem(this.ModelState);
             }
 
             var user = new User

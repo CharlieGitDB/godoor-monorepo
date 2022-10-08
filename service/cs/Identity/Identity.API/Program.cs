@@ -10,6 +10,7 @@ using Identity.Data.Repositories;
 using Identity.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
+using Hellang.Middleware.ProblemDetails;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,6 +55,27 @@ builder.Services.AddDbContext<IdentityDbContext>(options =>
         accountKey: cosmosDbSection.PrimaryKey,
         databaseName: cosmosDbSection.DbName
     );
+});
+
+//model validation options
+builder.Services.Configure<ApiBehaviorOptions>(o =>
+{
+    o.InvalidModelStateResponseFactory = context =>
+        {
+            var problemDetails = new ValidationProblemDetails(context.ModelState)
+            {
+                Instance = context.HttpContext.Request.Path,
+                Status = StatusCodes.Status400BadRequest,
+                Type = $"https://httpstatuses.com/400"
+            };
+            return new BadRequestObjectResult(problemDetails)
+            {
+                ContentTypes =
+                {
+                    "application/problem+json"
+                }
+            };
+        };
 });
 
 //repos
@@ -106,6 +128,11 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddProblemDetails(o =>
+{
+    o.IncludeExceptionDetails = (ctx, env) => builder.Environment.IsDevelopment() || builder.Environment.IsStaging();
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -120,6 +147,8 @@ if (app.Environment.IsDevelopment())
         o.OAuthScopeSeparator(" ");
     });
 }
+
+app.UseProblemDetails();
 
 app.UseHttpsRedirection();
 
