@@ -5,7 +5,7 @@ namespace Identity.API.Models.Request;
 
 public class CreateUserRequest
 {
-    public string Oid { get; set; }
+    public string? Oid { get; set; }
 }
 
 public class CreateUserRequestValidator : AbstractValidator<CreateUserRequest>

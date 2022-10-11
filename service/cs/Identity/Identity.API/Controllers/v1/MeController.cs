@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using System.Net;
+using FluentValidation;
 using FluentValidation.AspNetCore;
 using Identity.API.Models.Request;
 using Identity.Domain.Entities;
@@ -53,6 +54,17 @@ namespace Identity.API.Controllers.v1
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] CreateUserRequest createUserRequest)
         {
+            if (createUserRequest == null)
+            {
+                return new BadRequestObjectResult(new ProblemDetails
+                {
+                    Type = "https://www.rfc-editor.org/rfc/rfc7231#section-6.5.1",
+                    Title = "Unable to create user",
+                    Detail = "Unable to create user",
+                    Status = (int) HttpStatusCode.BadRequest
+                });
+            }
+
             var result = await _validator.ValidateAsync(createUserRequest);
 
             if (!result.IsValid)

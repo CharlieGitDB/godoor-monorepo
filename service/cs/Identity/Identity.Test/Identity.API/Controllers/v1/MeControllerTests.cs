@@ -149,7 +149,7 @@ public class MeControllerTests
         var result = await controller.Post(createUserRequest);
         
         Assert.IsNotNull(result);
-        Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+        Assert.IsInstanceOfType(result, typeof(ObjectResult));
     }
     
     [TestMethod]
