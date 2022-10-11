@@ -1,4 +1,4 @@
-﻿using System.Net;
+﻿using AutoWrapper.Wrappers;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Identity.API.Models.Request;
@@ -56,20 +56,15 @@ namespace Identity.API.Controllers.v1
         {
             if (createUserRequest == null)
             {
-                return new BadRequestObjectResult(new ProblemDetails
-                {
-                    Type = "https://www.rfc-editor.org/rfc/rfc7231#section-6.5.1",
-                    Title = "Unable to create user",
-                    Detail = "Unable to create user",
-                    Status = (int) HttpStatusCode.BadRequest
-                });
+                throw new ApiProblemDetailsException("Unable to create user", StatusCodes.Status400BadRequest);
             }
 
             var result = await _validator.ValidateAsync(createUserRequest);
 
             if (!result.IsValid)
             {
-                return ValidationProblem(this.ModelState);
+                result.AddToModelState(this.ModelState, null);
+                throw new ApiProblemDetailsException(ModelState);
             }
 
             var user = new User

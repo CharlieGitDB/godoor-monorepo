@@ -10,6 +10,7 @@ using Identity.Data.Repositories;
 using Identity.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
+using AutoWrapper;
 using Hellang.Middleware.ProblemDetails;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -57,25 +58,9 @@ builder.Services.AddDbContext<IdentityDbContext>(options =>
     );
 });
 
-//model validation options
 builder.Services.Configure<ApiBehaviorOptions>(o =>
 {
-    o.InvalidModelStateResponseFactory = context =>
-        {
-            var problemDetails = new ValidationProblemDetails(context.ModelState)
-            {
-                Instance = context.HttpContext.Request.Path,
-                Status = StatusCodes.Status400BadRequest,
-                Type = $"https://httpstatuses.com/400"
-            };
-            return new BadRequestObjectResult(problemDetails)
-            {
-                ContentTypes =
-                {
-                    "application/problem+json"
-                }
-            };
-        };
+    o.SuppressModelStateInvalidFilter = true;
 });
 
 //repos
@@ -130,7 +115,7 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddProblemDetails(o =>
 {
-    o.IncludeExceptionDetails = (ctx, env) => builder.Environment.IsDevelopment() || builder.Environment.IsStaging();
+    o.IncludeExceptionDetails = (ctx, env) => builder.Environment.IsDevelopment() || builder.Environment.IsProduction();
 });
 
 var app = builder.Build();
@@ -149,6 +134,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseProblemDetails();
+app.UseApiResponseAndExceptionWrapper(new AutoWrapperOptions { UseApiProblemDetailsException = true }); 
 
 app.UseHttpsRedirection();
 
