@@ -39,7 +39,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options => { builder.Configuration.Bind("AzureAdB2C", options); });
 // End of the Microsoft Identity platform block
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddNewtonsoftJson();
+    
 builder.Services.AddApiVersioning(options =>
 {
     options.ReportApiVersions = true;
