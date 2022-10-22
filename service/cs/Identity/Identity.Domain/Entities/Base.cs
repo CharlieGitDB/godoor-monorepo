@@ -13,11 +13,11 @@ public class Base
     public DateTime Created { get; set; }
 
     [PatchProtected]
-    public string? CreatedByOid { get; set; }
+    public string CreatedByOid { get; set; }
     
     [PatchProtected]
     public DateTime Modified { get; set; }
     
     [PatchProtected]
-    public string? ModifiedByOid { get; set; }
+    public string ModifiedByOid { get; set; }
 }
