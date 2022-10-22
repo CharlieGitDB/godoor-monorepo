@@ -41,7 +41,6 @@ namespace Identity.Data
             {
                 if (entity.State == EntityState.Added)
                 {
-                    ((Base) entity.Entity).Id = Guid.NewGuid();
                     ((Base) entity.Entity).Created = DateTime.UtcNow;
                 }
 

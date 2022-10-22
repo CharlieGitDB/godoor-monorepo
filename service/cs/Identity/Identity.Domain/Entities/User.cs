@@ -1,6 +1,6 @@
-﻿#nullable disable
-
+﻿using Identity.Domain.Attributes;
 using Identity.Domain.Enums;
+using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,10 +8,10 @@ namespace Identity.Domain.Entities
 {
     public class User : Base
     {
-        public string Oid { get; set; }
-
+        [PatchProtected(Accesslevel = (int) Role.Root, AllowedOperationTypes = new[] { (int) OperationType.Replace })]
         public Role Role { get; set; }
 
+        [PatchProtected(Accesslevel = (int) Role.Root, AllowedOperationTypes = new[] { (int) OperationType.Replace })]
         public bool Active { get; set; } = true;
     }
 
@@ -23,9 +23,6 @@ namespace Identity.Domain.Entities
             modelBuilder
                 .Property(u => u.Oid)
                 .IsRequired();
-            modelBuilder
-                .HasIndex(u => new { u.Id, u.Oid })
-                .IsUnique();
             modelBuilder
                 .Property(u => u.Role)
                 .IsRequired();

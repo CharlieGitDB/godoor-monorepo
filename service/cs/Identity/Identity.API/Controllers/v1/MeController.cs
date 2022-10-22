@@ -5,7 +5,9 @@ using Identity.API.Models.Request;
 using Identity.Domain.Entities;
 using Identity.Domain.Enums;
 using Identity.Domain.Interfaces;
+using Identity.Domain.Extensions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web;
 
@@ -39,7 +41,7 @@ namespace Identity.API.Controllers.v1
         [HttpGet("{id}")]
         public async Task<ActionResult> Get(string id)
         {
-            var user = await _userRepository.GetByOidAsync(id);
+            var user = await _userRepository.GetByIdAsync(id);
 
             if (user == null)
             {
@@ -80,39 +82,38 @@ namespace Identity.API.Controllers.v1
             return Ok(savedUser);
         }
 
-        // TODO: create user filter here
-        // PUT api/values/5
         [HttpPatch("{id}")]
-        public async Task<ActionResult> Patch(string id, [FromBody] UpdateUserRequest updateUserRequest)
+        public async Task<ActionResult> Patch(string id, [FromBody] JsonPatchDocument<User> userPatchDoc)
         {
             //shouldn't make it here unless we have confirmed the oid is the users id from a filter most likely
-            var currentUser = await _userRepository.GetByOidAsync(id);
+            var currentUser = await _userRepository.GetByIdAsync(id);
 
             if (currentUser == null)
             {
                 return NotFound();
             }
             
-            currentUser.Role = updateUserRequest.Role ?? currentUser.Role;
-            currentUser.Active = updateUserRequest.Active ?? currentUser.Active;
-            currentUser.ModifiedByOid = User.GetObjectId();
-            var updatedUser = await _userRepository.SaveAsync(currentUser);
+            userPatchDoc.ProtectedApplyTo(
+                currentUser, 
+                (int) currentUser.Role,
+                error => throw new ApiProblemDetailsException(error.ErrorMessage, StatusCodes.Status400BadRequest));
 
-            return Ok(updatedUser);
+            return Ok(currentUser);
         }
 
-        // TODO: use user filter here
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(string id)
         {
-            var userToDelete = await _userRepository.GetByOidAsync(id);
+            var userToDelete = await _userRepository.GetByIdAsync(id);
 
             if (userToDelete == null)
             {
                 return NotFound();
             }
 
-            await _userRepository.DeleteAsync(userToDelete);
+            //soft delete
+            userToDelete.Active = false;
+            await _userRepository.SaveAsync(userToDelete);
 
             return Ok();
         }
