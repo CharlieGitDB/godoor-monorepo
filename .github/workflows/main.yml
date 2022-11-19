@@ -1,0 +1,8 @@
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      tester: helloworld
+    steps:
+      run: |
+      echo $tester
