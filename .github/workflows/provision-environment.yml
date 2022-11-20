@@ -1,0 +1,18 @@
+name: Provision Godoor Environment
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: environment
+        description: Select the environment
+
+jobs:
+  configure-cosmosdb:
+    uses: ./.github/workflows/cosmosdb-config.yml
+    with:
+      cosmos-db-account: ${{ inputs.environment }}-godoor
+    secrets:
+      AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
