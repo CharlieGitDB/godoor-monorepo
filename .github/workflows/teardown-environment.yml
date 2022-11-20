@@ -18,4 +18,4 @@ jobs:
     
     - name: Delete Resource Group
       run: |
-        az group delete --resource-group ${{ inputs.environment }}-godoor-rg
+        az group delete --resource-group ${{ inputs.environment }}-godoor-rg --yes
