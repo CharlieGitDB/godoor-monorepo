@@ -16,22 +16,21 @@ on:
         - "southcentralus"
         - "northeurope"
 
-env:
-  resourcegroup: ${{ inputs.environment }}-godoor-rg
-
 jobs:
   configure-resourcegroup:
     uses: ./.github/workflows/resourcegroup-config.yml
     with:
-      resourcegroup: ${{ env.resourcegroup }}
+      resourcegroup: ${{ inputs.environment }}-godoor-rg
       resourcegroup-location: ${{ inputs.resourcegroup-location }}
     secrets:
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
   configure-cosmosdb:
+    needs: configure-resourcegroup
     uses: ./.github/workflows/cosmosdb-config.yml
     with:
-      resourcegroup: ${{ env.resourcegroup }}
+      resourcegroup: ${{ inputs.environment }}-godoor-rg
       cosmos-db-account: ${{ inputs.environment }}-godoor-db
     secrets:
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}

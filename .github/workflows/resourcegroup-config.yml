@@ -12,6 +12,8 @@ on:
     secrets:
       AZURE_CREDENTIALS:
         required: true
+      AZURE_SUBSCRIPTION_ID:
+        required: true
 
 jobs:
   provision-resourcegroup:
@@ -25,7 +27,7 @@ jobs:
     - name: Check if ${{ inputs.resourcegroup }} resource group exists
       id: resource-group-check
       run: |
-        echo "RESOURCE_GROUP_EXISTS=$(az group exists --name ${{ inputs.resource-group }})" >> $GITHUB_ENV
+        echo "RESOURCE_GROUP_EXISTS=$(az group exists --resource-group ${{ inputs.resourcegroup }} --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }})" >> $GITHUB_ENV
 
     - name: Create resource group if it doesn't exist
       if: ${{ env.RESOURCE_GROUP_EXISTS == 'false' }}
