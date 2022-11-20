@@ -3,15 +3,15 @@ name: Configure CosmosDB
 on:
   workflow_call:
     inputs:
+      resourcegroup:
+        required: true
+        type: string
       cosmos-db-account:
         required: true
         type: string
     secrets:
-      AZURE_RESOURCE_GROUP:
-        required: true
       AZURE_CREDENTIALS:
         required: true
-      AZURE_SUBSCRIPTION_ID:
 
 jobs:
   provision-cosmosdb-account:
@@ -30,4 +30,6 @@ jobs:
     - name: Create CosmosDB account if it doesn't exist
       if: ${{ env.DB_EXISTS == 'false' }}
       run: |
-        az cosmosdb create --name ${{ inputs.cosmos-db-account }} --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }}
+        az cosmosdb create --name ${{ inputs.cosmos-db-account }} --resource-group ${{ inputs.resourcegroup }}
+
+    # may need to provision the identity database and user collection
