@@ -6,13 +6,32 @@ on:
       environment:
         type: environment
         description: Select the environment
+      resourcegroup-location:
+        type: choice
+        description: Select the location
+        options:
+        - "eastus"
+        - "westus"
+        - "centralus"
+        - "southcentralus"
+        - "northeurope"
+
+env:
+  resourcegroup: ${{ inputs.environment }}-godoor-rg
 
 jobs:
+  configure-resourcegroup:
+    uses: ./.github/workflows/resourcegroup-config.yml
+    with:
+      resourcegroup: ${{ env.resourcegroup }}
+      resourcegroup-location: ${{ inputs.resourcegroup-location }}
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+
   configure-cosmosdb:
     uses: ./.github/workflows/cosmosdb-config.yml
     with:
-      cosmos-db-account: ${{ inputs.environment }}-godoor
+      resourcegroup: ${{ env.resourcegroup }}
+      cosmos-db-account: ${{ inputs.environment }}-godoor-db
     secrets:
-      AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}

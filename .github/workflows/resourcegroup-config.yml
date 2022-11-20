@@ -1,0 +1,33 @@
+name: Configure Resource Group
+
+on:
+  workflow_call:
+    inputs:
+      resourcegroup:
+        required: true
+        type: string
+      resourcegroup-location:
+        required: true
+        type: string
+    secrets:
+      AZURE_CREDENTIALS:
+        required: true
+
+jobs:
+  provision-resourcegroup:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@main
+    - uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Check if ${{ inputs.resourcegroup }} resource group exists
+      id: resource-group-check
+      run: |
+        echo "RESOURCE_GROUP_EXISTS=$(az group exists --name ${{ inputs.resource-group }})" >> $GITHUB_ENV
+
+    - name: Create resource group if it doesn't exist
+      if: ${{ env.RESOURCE_GROUP_EXISTS == 'false' }}
+      run: |
+        az group create --name ${{ inputs.resourcegroup }} --location ${{ inputs.resourcegroup-location }}
