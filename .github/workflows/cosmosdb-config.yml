@@ -14,7 +14,7 @@ on:
       AZURE_SUBSCRIPTION_ID:
 
 jobs:
-  provision-identity:
+  provision-cosmosdb-account:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@main
