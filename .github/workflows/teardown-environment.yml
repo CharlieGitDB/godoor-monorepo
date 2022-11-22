@@ -1,0 +1,21 @@
+name: Teardown Godoor Environment
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: environment
+        description: Select the environment
+
+jobs:
+  delete-resourcegroup:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@main
+    - uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - name: Delete Resource Group
+      run: |
+        az group delete --resource-group ${{ inputs.environment }}-godoor-rg --yes

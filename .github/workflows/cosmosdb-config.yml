@@ -1,0 +1,35 @@
+name: Configure CosmosDB
+
+on:
+  workflow_call:
+    inputs:
+      resourcegroup:
+        required: true
+        type: string
+      cosmos-db-account:
+        required: true
+        type: string
+    secrets:
+      AZURE_CREDENTIALS:
+        required: true
+
+jobs:
+  provision-cosmosdb-account:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@main
+    - uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Check if ${{ inputs.cosmos-db-account }} account exists
+      id: cosmos-db-check
+      run: |
+        echo "DB_EXISTS=$(az cosmosdb check-name-exists --name ${{ inputs.cosmos-db-account }})" >> $GITHUB_ENV
+
+    - name: Create CosmosDB account if it doesn't exist
+      if: ${{ env.DB_EXISTS == 'false' }}
+      run: |
+        az cosmosdb create --name ${{ inputs.cosmos-db-account }} --resource-group ${{ inputs.resourcegroup }}
+
+    # may need to provision the identity database and user collection

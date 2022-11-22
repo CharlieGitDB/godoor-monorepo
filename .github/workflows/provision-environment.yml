@@ -1,0 +1,36 @@
+name: Provision Godoor Environment
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: environment
+        description: Select the environment
+      resourcegroup-location:
+        type: choice
+        description: Select the location
+        options:
+        - "eastus"
+        - "westus"
+        - "centralus"
+        - "southcentralus"
+        - "northeurope"
+
+jobs:
+  configure-resourcegroup:
+    uses: ./.github/workflows/resourcegroup-config.yml
+    with:
+      resourcegroup: ${{ inputs.environment }}-godoor-rg
+      resourcegroup-location: ${{ inputs.resourcegroup-location }}
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+  configure-cosmosdb:
+    needs: configure-resourcegroup
+    uses: ./.github/workflows/cosmosdb-config.yml
+    with:
+      resourcegroup: ${{ inputs.environment }}-godoor-rg
+      cosmos-db-account: ${{ inputs.environment }}-godoor-db
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
