@@ -17,89 +17,20 @@ namespace Identity.Test.Identity.API.Controllers.v1;
 
 [TestClass]
 public class MeControllerTests
-{
-
-    [TestMethod]
-    public async Task GetAll_ShouldReturnListOfUsers()
-    {
-        var mockValidator = new Mock<IValidator<CreateUserRequest>>();
-        var mockUserRepository = new Mock<IUserRepository>();
-        Task<List<User>>? mockData = Task.FromResult(new List<User>
-        {
-            new(),
-            new()
-        });
-        mockUserRepository.Setup(r => r.GetAllAsync())
-           .Returns(mockData);
-
-        var controller = new MeController(mockValidator.Object, mockUserRepository.Object);
-        var result = await controller.Get() ?? throw new NullReferenceException();
-        
-        Assert.IsNotNull(result);
-        Assert.IsInstanceOfType(result, typeof(OkObjectResult));
-        var okResult = (OkObjectResult) result;
-        var okResultValue = (List<User>) okResult.Value;
-        Assert.IsNotNull(okResultValue);
-        Assert.AreEqual(okResultValue.Count, 2);
-    }
-    
+{   
     [TestMethod]
     public async Task GetOne_WithMatchingOid_ShouldReturnOneUser()
     {
-        var oid = "fakeoid";
-        var mockValidator = new Mock<IValidator<CreateUserRequest>>();
-        var mockUserRepository = new Mock<IUserRepository>();
-        var mockData = Task.FromResult(new User
-        {
-            Oid = oid
-        });
-        mockUserRepository.Setup(r => r.GetByIdAsync(oid))
-            .Returns(mockData);
-
-        var controller = new MeController(mockValidator.Object, mockUserRepository.Object);
-        var result = await controller.Get(oid);
-        
-        Assert.IsNotNull(result);
-        Assert.IsInstanceOfType(result, typeof(OkObjectResult));
-        var okResult = (OkObjectResult) result;
-        var okResultValue = (User) okResult.Value;
-        Assert.IsNotNull(okResultValue);
-        Assert.AreEqual(okResultValue.Oid, oid);
-    }
-    
-    [TestMethod]
-    public async Task GetOne_WithoutMatchingOid_ShouldReturnNotFound()
-    {
-        var oid = "fakeoid";
-        var mockValidator = new Mock<IValidator<CreateUserRequest>>();
-        var mockUserRepository = new Mock<IUserRepository>();
-        var mockData = Task.FromResult(new User
-        {
-            Oid = oid
-        });
-        mockUserRepository.Setup(r => r.GetByIdAsync("wrongid"))
-            .Returns(mockData);
-
-        var controller = new MeController(mockValidator.Object, mockUserRepository.Object);
-        var result = await controller.Get(oid);
-        
-        Assert.IsNotNull(result);
-        Assert.IsInstanceOfType(result, typeof(NotFoundResult));
-    }
-    
-    [TestMethod]
-    public async Task Post_ShouldReturnOkResult()
-    {
         var fakeoid = "fakeoid";
         var mockValidator = new Mock<IValidator<CreateUserRequest>>();
-        mockValidator
-            .Setup(x => x.ValidateAsync(It.IsAny<CreateUserRequest>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new ValidationResult());
         var mockUserRepository = new Mock<IUserRepository>();
-        var createUserRequest = new CreateUserRequest
+        var mockData = Task.FromResult(new User
         {
             Oid = fakeoid
-        };
+        });
+        mockUserRepository.Setup(r => r.GetByIdAsync(fakeoid))
+            .Returns(mockData);
+
         var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
         {
             new ("oid", fakeoid)
@@ -114,6 +45,36 @@ public class MeControllerTests
                 User = user
             }
         };
+        var result = await controller.Get();
+
+        Assert.IsNotNull(result);
+        Assert.IsInstanceOfType(result, typeof(OkObjectResult));
+        var okResult = (OkObjectResult) result;
+        var okResultValue = (User) okResult.Value;
+        Assert.IsNotNull(okResultValue);
+        Assert.AreEqual(okResultValue.Oid, fakeoid);
+    }
+
+    
+    [TestMethod]
+    public async Task Post_ShouldReturnOkResult()
+    {
+        var fakeoid = "fakeoid";
+        var mockValidator = new Mock<IValidator<CreateUserRequest>>();
+        mockValidator
+            .Setup(x => x.ValidateAsync(It.IsAny<CreateUserRequest>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult());
+        var mockUserRepository = new Mock<IUserRepository>();
+        var createUserRequest = new CreateUserRequest
+        {
+            ObjectId = fakeoid,
+            DisplayName = "fakename",
+            GivenName = "test",
+            Surname = "lastname"
+        };
+
+        var controller = new MeController(mockValidator.Object, mockUserRepository.Object);
+
         var result = await controller.Post(createUserRequest);
         
         Assert.IsNotNull(result);
@@ -163,12 +124,11 @@ public class MeControllerTests
     [TestMethod]
     public async Task Patch_ShouldReturnNotFoundWhenUserIsNotFound()
     {
-        var fakeoid = "fakeoid";
         var mockValidator = new Mock<IValidator<CreateUserRequest>>();
         var mockUserRepository = new Mock<IUserRepository>();
 
         var controller = new MeController(mockValidator.Object, mockUserRepository.Object);
-        var result = await controller.Patch(fakeoid, new JsonPatchDocument<User>());
+        var result = await controller.Patch( new JsonPatchDocument<User>());
         
         Assert.IsInstanceOfType(result, typeof(NotFoundResult));
     }
@@ -198,8 +158,7 @@ public class MeControllerTests
                 User = user
             }
         };
-        var result = await controller.Patch(fakeoid, new JsonPatchDocument<User>());
-        
+        var result = await controller.Patch(new JsonPatchDocument<User>());
         Assert.IsNotNull(result);
         Assert.IsInstanceOfType(result, typeof(OkObjectResult));
         var okResult = (OkObjectResult) result;
@@ -217,7 +176,7 @@ public class MeControllerTests
             .Returns(Task.FromResult(new User()));
 
         var controller = new MeController(mockValidator.Object, mockUserRepository.Object);
-        var result = await controller.Delete(fakeoid);
+        var result = await controller.Delete();
         
         Assert.IsInstanceOfType(result, typeof(OkResult));
     }
@@ -229,8 +188,20 @@ public class MeControllerTests
         var mockValidator = new Mock<IValidator<CreateUserRequest>>();
         var mockUserRepository = new Mock<IUserRepository>();
 
+        var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+        {
+            new ("oid", fakeoid)
+        }, "mock"));
+
         var controller = new MeController(mockValidator.Object, mockUserRepository.Object);
-        var result = await controller.Delete(fakeoid);
+        controller.ControllerContext = new ControllerContext()
+        {
+            HttpContext = new DefaultHttpContext()
+            {
+                User = user
+            }
+        };
+        var result = await controller.Delete();
         
         Assert.IsInstanceOfType(result, typeof(NotFoundResult));
     }

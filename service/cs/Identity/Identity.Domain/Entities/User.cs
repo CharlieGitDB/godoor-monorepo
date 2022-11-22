@@ -20,6 +20,7 @@ namespace Identity.Domain.Entities
         public void Configure(EntityTypeBuilder<User> modelBuilder)
         {
             modelBuilder.ToContainer("user");
+            modelBuilder.HasKey(u => u.Oid);
             modelBuilder
                 .Property(u => u.Oid)
                 .IsRequired();

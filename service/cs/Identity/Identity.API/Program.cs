@@ -5,13 +5,15 @@ using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Identity.Data;
 using Identity.API.Configurations;
-using Identity.API.Models.Request;
 using Identity.Data.Repositories;
 using Identity.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using AutoWrapper;
 using Hellang.Middleware.ProblemDetails;
+using Microsoft.AspNetCore.Authorization;
+using Identity.API.Filters;
+using Identity.API.Models.Request;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +22,7 @@ string API_VERSION = builder.Configuration["ApiVersion"];
 AzureAdB2CSection azureB2CSection = builder.Configuration.GetSection("AzureAdB2C").Get<AzureAdB2CSection>();
 CosmosDbSection cosmosDbSection =
     builder.Configuration.GetSection("CosmosDB").Get<CosmosDbSection>();
+ApiConnectorRequirement apiConnectorSection = builder.Configuration.GetSection("ApiConnector").Get<ApiConnectorRequirement>();
 
 //login access config vars
 string API_PERMISSION = builder.Configuration["Scope"];
@@ -67,6 +70,15 @@ builder.Services.Configure<ApiBehaviorOptions>(o =>
 
 //repos
 builder.Services.AddTransient<IUserRepository, UserRepository>();
+
+//auth handlers
+builder.Services.AddSingleton<IAuthorizationHandler, ApiConnectorHandler>();
+
+//policies
+builder.Services.AddAuthorization(o =>
+{
+    o.AddPolicy("ApiConnectorBasicAuth", policy => policy.Requirements.Add(apiConnectorSection as ApiConnectorRequirement));
+});
 
 //validation
 builder.Services.AddScoped<IValidator<CreateUserRequest>, CreateUserRequestValidator>();
