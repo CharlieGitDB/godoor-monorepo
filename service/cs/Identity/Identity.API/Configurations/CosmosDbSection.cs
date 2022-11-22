@@ -1,7 +1,7 @@
 namespace Identity.API.Configurations;
 
 #nullable disable
-public class CosmosDbSection
+public record CosmosDbSection
 {
     public string EndPointUri { get; set; }
 

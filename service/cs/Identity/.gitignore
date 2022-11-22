@@ -288,6 +288,4 @@ paket-files/
 /.vscode/settings.json
 
 # Service Specific
-/Identity.API/.vscode
 /Identity.API/appsettings.Development.json
-.vscode

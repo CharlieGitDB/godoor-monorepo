@@ -1,11 +1,23 @@
+using Identity.Domain.Attributes;
+
+#nullable disable
+
 namespace Identity.Domain.Entities;
 
 public class Base
 {
-    public Guid Id { get; set; } 
+    [PatchProtected]
+    public string Oid { get; set; }
+   
+    [PatchProtected]
     public DateTime Created { get; set; }
-    public string? CreatedByOid { get; set; }
+
+    [PatchProtected]
+    public string CreatedByOid { get; set; }
     
+    [PatchProtected]
     public DateTime Modified { get; set; }
-    public string? ModifiedByOid { get; set; }
+    
+    [PatchProtected]
+    public string ModifiedByOid { get; set; }
 }

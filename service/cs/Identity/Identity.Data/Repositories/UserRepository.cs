@@ -15,13 +15,11 @@ public class UserRepository : IUserRepository
 
     public async Task<List<User>?> GetAllAsync() => await _dbContext.Users.ToListAsync();
 
-    public async Task<User?> GetByIdAsync(string id) => await _dbContext.Users.FindAsync(id);
-
-    public async Task<User?> GetByOidAsync(string id) => await _dbContext.Users.FirstOrDefaultAsync(u => u.Oid == id);
+    public async Task<User?> GetByIdAsync(string oid) => await _dbContext.Users.FindAsync(oid);
 
     public async Task<int> SaveAsync(User user)
     {
-        if (await _dbContext.Users.FindAsync(user.Id) is User existing)
+        if (await _dbContext.Users.FindAsync(user.Oid) is User existing)
         {
             _dbContext.Entry(existing).CurrentValues.SetValues(user);
         }

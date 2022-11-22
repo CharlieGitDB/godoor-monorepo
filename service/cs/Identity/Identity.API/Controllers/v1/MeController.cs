@@ -5,7 +5,9 @@ using Identity.API.Models.Request;
 using Identity.Domain.Entities;
 using Identity.Domain.Enums;
 using Identity.Domain.Interfaces;
+using Identity.Domain.Extensions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web;
 
@@ -13,7 +15,6 @@ using Microsoft.Identity.Web;
 
 namespace Identity.API.Controllers.v1
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiVersion("1.0")]
     public class MeController : Controller
@@ -27,19 +28,16 @@ namespace Identity.API.Controllers.v1
             _userRepository = userRepository;
         }
         
-        // TODO: should this even exist? If so it needs to be locked to admins
-        // GET: api/values
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult> Get()
         {
-            return Ok(await _userRepository.GetAllAsync());
-        }
-
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult> Get(string id)
-        {
-            var user = await _userRepository.GetByOidAsync(id);
+            if (User.GetObjectId() == null)
+            {
+                return NotFound();
+            }
+            
+            var user = await _userRepository.GetByIdAsync(User.GetObjectId());
 
             if (user == null)
             {
@@ -49,12 +47,11 @@ namespace Identity.API.Controllers.v1
             return Ok(user);
         }
         
-        // TODO: this needs to only be able to be hit by a azure function that runs on azure b2c creation
-        // POST api/values
+        [Authorize("ApiConnectorBasicAuth")]
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] CreateUserRequest createUserRequest)
         {
-            if (createUserRequest == null)
+            if (createUserRequest == null || createUserRequest.ObjectId == null)
             {
                 throw new ApiProblemDetailsException("Unable to create user", StatusCodes.Status400BadRequest);
             }
@@ -69,10 +66,10 @@ namespace Identity.API.Controllers.v1
 
             var user = new User
             {
-                Oid = createUserRequest.Oid,
+                Oid = createUserRequest.ObjectId,
                 Role = Role.User,
-                CreatedByOid = User.GetObjectId(),
-                ModifiedByOid = User.GetObjectId()
+                CreatedByOid = createUserRequest.ObjectId,
+                ModifiedByOid = createUserRequest.ObjectId
             };
             
             var savedUser = await _userRepository.SaveAsync(user);
@@ -80,40 +77,48 @@ namespace Identity.API.Controllers.v1
             return Ok(savedUser);
         }
 
-        // TODO: create user filter here
-        // PUT api/values/5
-        [HttpPatch("{id}")]
-        public async Task<ActionResult> Patch(string id, [FromBody] UpdateUserRequest updateUserRequest)
+        [Authorize]
+        [HttpPatch]
+        public async Task<ActionResult> Patch([FromBody] JsonPatchDocument<User> userPatchDoc)
         {
-            //shouldn't make it here unless we have confirmed the oid is the users id from a filter most likely
-            var currentUser = await _userRepository.GetByOidAsync(id);
+            if (User.GetObjectId() == null)
+            {
+                return NotFound();
+            }
+
+            var currentUser = await _userRepository.GetByIdAsync(User.GetObjectId());
 
             if (currentUser == null)
             {
                 return NotFound();
             }
             
-            currentUser.Role = updateUserRequest.Role ?? currentUser.Role;
-            currentUser.Active = updateUserRequest.Active ?? currentUser.Active;
-            currentUser.ModifiedByOid = User.GetObjectId();
-            var updatedUser = await _userRepository.SaveAsync(currentUser);
+            userPatchDoc.ProtectedApplyTo(
+                currentUser, 
+                (int) currentUser.Role,
+                error => throw new ApiProblemDetailsException(error.ErrorMessage, StatusCodes.Status400BadRequest));
 
-            return Ok(updatedUser);
+            return Ok(currentUser);
         }
 
-        // TODO: use user filter here
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete(string id)
+        [Authorize]
+        [HttpDelete]
+        public async Task<ActionResult> Delete()
         {
-            var userToDelete = await _userRepository.GetByOidAsync(id);
+            var userToDelete = await _userRepository.GetByIdAsync(User.GetObjectId());
 
             if (userToDelete == null)
             {
                 return NotFound();
             }
 
-            await _userRepository.DeleteAsync(userToDelete);
+            //soft delete
+            userToDelete.Active = false;
+            await _userRepository.SaveAsync(userToDelete);
 
+            //need to kill the users session
+            //https://stackoverflow.com/questions/41187094/azure-ad-b2c-sign-out-a-user-from-all-sessions
+            
             return Ok();
         }
     }
